@@ -74,7 +74,7 @@ export class PlayersService {
       return findedPlayer;
     }
 
-    throw new NotFoundException(`Jogador com ${id} não encontrado.`);
+    throw new NotFoundException(`Jogador com id ${id} não encontrado.`);
   }
 
   async deleteById(id: string) {
