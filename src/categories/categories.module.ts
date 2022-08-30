@@ -13,5 +13,6 @@ const MongooseModuleInstance = MongooseModule.forFeature([
   imports: [MongooseModuleInstance, PlayersModule],
   controllers: [CategoriesController],
   providers: [CategoriesService],
+  exports: [CategoriesService],
 })
 export class CategoriesModule {}

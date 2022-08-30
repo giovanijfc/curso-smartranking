@@ -101,4 +101,12 @@ export class CategoriesService {
       .updateOne({ category }, { $set: findedCategory })
       .exec();
   }
+
+  async getCategoryByPlayerId(playerId: string) {
+    return await this.categoryModel
+      .findOne()
+      .where('players')
+      .in(playerId as any)
+      .exec();
+  }
 }
