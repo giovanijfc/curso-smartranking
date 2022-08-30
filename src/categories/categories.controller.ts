@@ -1,6 +1,8 @@
 import {
   Body,
   Controller,
+  Get,
+  Param,
   Post,
   UsePipes,
   ValidationPipe,
@@ -16,5 +18,15 @@ export class CategoriesController {
   @UsePipes(ValidationPipe)
   async create(@Body() createCategoryDTO: CreateCategoryDTO) {
     return this.categoriesService.create(createCategoryDTO);
+  }
+
+  @Get('/all')
+  async getAll() {
+    return this.categoriesService.getAll();
+  }
+
+  @Get('/:category')
+  async getById(@Param('category') category: string) {
+    return this.categoriesService.getById(category);
   }
 }
