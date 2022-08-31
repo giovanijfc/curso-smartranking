@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
+  Query,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -16,5 +18,10 @@ export class ChallengesController {
   @UsePipes(ValidationPipe)
   async create(@Body() createChallengeDTO: CreateChallengeDTO) {
     return this.challengesService.create(createChallengeDTO);
+  }
+
+  @Get()
+  async get(@Query('playerId') playerId?: string) {
+    return this.challengesService.getAllOrByPlayerId(playerId);
   }
 }

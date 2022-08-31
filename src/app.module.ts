@@ -12,7 +12,12 @@ const MoongoseModuleInstance = MongooseModule.forRoot(
 );
 
 @Module({
-  imports: [MoongoseModuleInstance, PlayersModule, CategoriesModule, ChallengesModule],
+  imports: [
+    MoongoseModuleInstance,
+    PlayersModule,
+    CategoriesModule,
+    ChallengesModule,
+  ],
   controllers: [],
   providers: [],
 })

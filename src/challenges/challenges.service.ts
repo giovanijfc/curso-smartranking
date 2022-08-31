@@ -54,8 +54,21 @@ export class ChallengesService {
       category: requesterPlayerCategory.category,
       solicitationDate: new Date(),
       status: ChallengeStatus.PENDING,
+      requester: createChallengeDTO.requesterId,
     });
 
     return await createdChallenge.save();
+  }
+
+  async getAllOrByPlayerId(playerId?: string) {
+    if (playerId) {
+      await this.playersService.getById(playerId);
+      return await this.challengeModel
+        .find({ players: playerId })
+        .populate('players')
+        .exec();
+    }
+
+    return await this.challengeModel.find().populate('players').exec();
   }
 }
