@@ -77,7 +77,10 @@ export class ChallengesService {
     return await this.challengeModel.find().populate('players').exec();
   }
 
-  async update(challengeId: string, updateChallengeDTO: UpdateChallengeDTO) {
+  async updateById(
+    challengeId: string,
+    updateChallengeDTO: UpdateChallengeDTO,
+  ) {
     const findedChallenge = await this.challengeModel
       .findOne({ _id: challengeId })
       .exec();
@@ -87,6 +90,21 @@ export class ChallengesService {
         { _id: challengeId },
         updateChallengeDTO,
       );
+      return;
+    }
+
+    throw new NotFoundException(
+      `Desafio com id ${challengeId} não encontrado.`,
+    );
+  }
+
+  async deleteById(challengeId: string) {
+    const findedChallenge = await this.challengeModel
+      .findOne({ _id: challengeId })
+      .exec();
+
+    if (findedChallenge) {
+      await findedChallenge.delete();
       return;
     }
 

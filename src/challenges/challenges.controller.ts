@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -31,10 +32,17 @@ export class ChallengesController {
 
   @Put('/:challengeId')
   @UsePipes(ValidationPipe)
-  async update(
+  async updateById(
     @Body() updateChallengeDTO: UpdateChallengeDTO,
     @Param('challengeId', ValidationParametersPipe) challengeId: string,
   ) {
-    return this.challengesService.update(challengeId, updateChallengeDTO);
+    return this.challengesService.updateById(challengeId, updateChallengeDTO);
+  }
+
+  @Delete('/:challengeId')
+  async deleteById(
+    @Param('challengeId', ValidationParametersPipe) challengeId: string,
+  ) {
+    return this.challengesService.deleteById(challengeId);
   }
 }
