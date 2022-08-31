@@ -13,6 +13,7 @@ import {
 import { ValidationParametersPipe } from 'src/common/pipes/validation-parameters.pipe';
 import { ChallengesService } from './challenges.service';
 import { CreateChallengeDTO } from './dtos/create-challenge.dto';
+import { LinkGameInChallengeDTO } from './dtos/link-game-in-challenge.dto';
 import { UpdateChallengeDTO } from './dtos/update-challenge.dto';
 
 @Controller('api/v1/challenges')
@@ -44,5 +45,17 @@ export class ChallengesController {
     @Param('challengeId', ValidationParametersPipe) challengeId: string,
   ) {
     return this.challengesService.deleteById(challengeId);
+  }
+
+  @Post('/:challengeId/link-game')
+  @UsePipes(ValidationPipe)
+  async linkGameInChallenge(
+    @Param('challengeId', ValidationParametersPipe) challengeId: string,
+    @Body() linkGameInChallengeDTO: LinkGameInChallengeDTO,
+  ) {
+    return this.challengesService.linkGameInChallenge(
+      challengeId,
+      linkGameInChallengeDTO,
+    );
   }
 }

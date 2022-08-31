@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -8,14 +9,17 @@ import { Model } from 'mongoose';
 import { CategoriesService } from 'src/categories/categories.service';
 import { PlayersService } from 'src/players/players.service';
 import { CreateChallengeDTO } from './dtos/create-challenge.dto';
+import { LinkGameInChallengeDTO } from './dtos/link-game-in-challenge.dto';
 import { UpdateChallengeDTO } from './dtos/update-challenge.dto';
 import { ChallengeStatus } from './enums/challenge-status.enum';
 import { Challenge } from './interfaces/challenge.interface';
+import { Game } from './interfaces/game.interface';
 
 @Injectable()
 export class ChallengesService {
   constructor(
     @InjectModel('Challenge') private readonly challengeModel: Model<Challenge>,
+    @InjectModel('Game') private readonly gameModel: Model<Game>,
     private readonly playersService: PlayersService,
     private readonly categoriesService: CategoriesService,
   ) {}
@@ -71,6 +75,8 @@ export class ChallengesService {
       return await this.challengeModel
         .find({ players: playerId })
         .populate('players')
+        .populate('requester')
+        .populate('game')
         .exec();
     }
 
@@ -111,5 +117,41 @@ export class ChallengesService {
     throw new NotFoundException(
       `Desafio com id ${challengeId} não encontrado.`,
     );
+  }
+
+  async linkGameInChallenge(
+    challengeId: string,
+    linkGameInChallengeDTO: LinkGameInChallengeDTO,
+  ) {
+    const findedChallenge = await this.challengeModel
+      .findOne({ _id: challengeId })
+      .exec();
+
+    if (!findedChallenge) {
+      throw new NotFoundException(
+        `Desafio com id ${challengeId} não encontrado.`,
+      );
+    }
+
+    await this.playersService.getById(linkGameInChallengeDTO.defenderId);
+
+    const createdGame = await new this.gameModel({
+      ...linkGameInChallengeDTO,
+      defender: linkGameInChallengeDTO.defenderId,
+      category: findedChallenge.category,
+      players: findedChallenge.players,
+    }).save();
+
+    findedChallenge.status = ChallengeStatus.REALIZED;
+    findedChallenge.game = createdGame._id as unknown as Game;
+
+    try {
+      await this.challengeModel
+        .findOneAndUpdate({ _id: challengeId }, { $set: findedChallenge })
+        .exec();
+    } catch (e) {
+      await createdGame.delete();
+      throw new InternalServerErrorException(e);
+    }
   }
 }
